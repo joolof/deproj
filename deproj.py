@@ -57,17 +57,27 @@ class Deproj():
             for it in range(self._nt):
                 sel = ((self._distance >= rad[ir]) & (self._distance < rad[ir+1]) & (self._azimuth >= theta[it]) & (self._azimuth < theta[it+1]))
                 density[ir, it] = np.median(self._qphi[sel])
-
-        # print(np.shape(density), np.shape(rad[:-1]))
-        fig = plt.figure(figsize=(7,6))
-        # ax1 = fig.add_axes([0.16, 0.14, 0.8, 0.79])
-        ax1 = fig.add_axes([0.16, 0.14, 0.8, 0.79], projection = 'polar')
-        ax1.pcolormesh(theta[:-1], rad[:-1], density, vmin = np.percentile(density, 1.), vmax = np.percentile(density, 99.5))
-        ax1.set_xlim()
-        ax1.set_ylim()
-        # ax1.set_xlabel()
-        # ax1.set_ylabel()
+        fig = plt.figure(figsize=(10., 5.))
+        ax1 = fig.add_subplot(121)
+        ax1.grid(False)
+        ax1.pcolormesh(theta[:-1] * 180. / np.pi, rad[:-1], density, vmin = np.nanpercentile(density, 1.), vmax = np.nanpercentile(density, 99.5))
+        ax2 = fig.add_subplot(122, polar=True)
+        ax2.grid(False)
+        ax2.pcolormesh(theta[:-1], rad[:-1], density, vmin = np.nanpercentile(density, 1.), vmax = np.nanpercentile(density, 99.5))
+        # ax2.set_xticks([])
+        ax2.set_yticks([])
         plt.show()
+        # print(np.shape(density), np.shape(rad[:-1]))
+        # fig = plt.figure(figsize=(7,6))
+        # # ax1 = fig.add_axes([0.16, 0.14, 0.8, 0.79])
+        # ax1 = fig.add_axes([0.16, 0.14, 0.8, 0.79], projection = 'polar')
+        # ax1.grid(False)
+        # ax1.pcolormesh(theta[:-1], rad[:-1], density, vmin = np.nanpercentile(density, 1.), vmax = np.nanpercentile(density, 99.5))
+        # ax1.set_xlim()
+        # ax1.set_ylim()
+        # # ax1.set_xlabel()
+        # # ax1.set_ylabel()
+        # plt.show()
 
 
     def debug(self, **kwargs):
@@ -215,9 +225,12 @@ Plot the points
 """
 
 if __name__ == '__main__':
-    test = Deproj('test/HR4796_Qphi_400.fits', nr = 30, nt = 60, pixscale = 0.0072)
-    test.go(amin = 0.6, amax = 1.5, incl = 77.72, pa = -151.59)
+    # test = Deproj('test/HD129590_Qphi_300.fits', nr = 11, nt = 30)
+    # test.go(amin = 0.15, amax = 0.8, incl = 82.00, pa = -60.61)
 
-    # test = Deproj('test/HD121617_Qphi_500.fits', nr = 40, nt = 60)
+    # test = Deproj('test/HR4796_Qphi_400.fits', nr = 30, nt = 60, pixscale = 0.0072)
+    # test.go(amin = 0.6, amax = 1.5, incl = 77.72, pa = -151.59)
+
+    test = Deproj('test/HD121617_Qphi_500.fits', nr = 40, nt = 60)
+    test.go(amin = 0.3, amax = 1.2, incl = 44.6, pa = -118.78)
     # test.debug(amin = 0.5, amax = 1.5, incl = 80.6, pa = 10., omega = 0.)
-    # test.go(amin = 0.3, amax = 1.2, incl = 44.6, pa = -118.78)
