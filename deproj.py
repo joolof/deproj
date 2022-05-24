@@ -45,10 +45,14 @@ class Deproj():
         Main method to compute the things
         """
         self._check_parameters(kwargs)
+        plot = True
+        if 'plot' in kwargs:
+            plot = kwargs['plot']
         self._xm = ((np.cos(self._pa) * self._Xin + np.sin(self._pa) * self._Yin))
         self._ym = ((np.sin(self._pa) * self._Xin - np.cos(self._pa) * self._Yin)) / np.cos(self._incl)
         self._distance = np.sqrt(self._xm**2. + self._ym**2.)
-        self._azimuth = np.arctan2(self._ym, self._xm)
+        self._azimuth = (np.arctan2(self._ym,self._xm) + np.pi/2.) % (2. * np.pi) - np.pi
+        # self._azimuth = np.arctan2(self._ym, self._xm)
 
         rad = np.linspace(self._amin, self._amax, num = self._nr+1)
         theta = np.linspace(-np.pi, np.pi, num = self._nt+1)
@@ -57,49 +61,58 @@ class Deproj():
             for it in range(self._nt):
                 sel = ((self._distance >= rad[ir]) & (self._distance < rad[ir+1]) & (self._azimuth >= theta[it]) & (self._azimuth < theta[it+1]))
                 density[ir, it] = np.median(self._qphi[sel])
-        fig = plt.figure(figsize=(10., 5.))
-        ax1 = fig.add_subplot(121)
-        ax1.grid(False)
-        ax1.pcolormesh(theta[:-1] * 180. / np.pi, rad[:-1], density, vmin = np.nanpercentile(density, 1.), vmax = np.nanpercentile(density, 99.5))
-        ax2 = fig.add_subplot(122, polar=True)
-        ax2.grid(False)
-        ax2.pcolormesh(theta[:-1], rad[:-1], density, vmin = np.nanpercentile(density, 1.), vmax = np.nanpercentile(density, 99.5))
-        # ax2.set_xticks([])
-        ax2.set_yticks([])
-        plt.show()
-        # print(np.shape(density), np.shape(rad[:-1]))
-        # fig = plt.figure(figsize=(7,6))
-        # # ax1 = fig.add_axes([0.16, 0.14, 0.8, 0.79])
-        # ax1 = fig.add_axes([0.16, 0.14, 0.8, 0.79], projection = 'polar')
-        # ax1.grid(False)
-        # ax1.pcolormesh(theta[:-1], rad[:-1], density, vmin = np.nanpercentile(density, 1.), vmax = np.nanpercentile(density, 99.5))
-        # ax1.set_xlim()
-        # ax1.set_ylim()
-        # # ax1.set_xlabel()
-        # # ax1.set_ylabel()
-        # plt.show()
 
+        if plot:
+            """
+            Set the cuts
+            """
+            dmin = np.nanpercentile(density, 1.)
+            dmax = np.nanpercentile(density, 99.5)
+            qmin = np.nanpercentile(self._qphi, 1.)
+            qmax = np.nanpercentile(self._qphi, 99.5)
+            """
+            Make the plot
+            """
+            fig = plt.figure(figsize=(15., 5.))
+            ax1 = fig.add_subplot(131)
+            ax1.imshow(self._qphi, origin='lower', extent = [self._xlim, -self._xlim, -self._xlim, self._xlim], vmin = qmin, vmax = qmax)
+            ax1.set_xlabel('$\\alpha$ [$^{\prime\prime}$]')
+            ax1.set_ylabel('$\delta$ [$^{\prime\prime}$]')
+            ax1.set_xlim(self._amax * 1.5, -self._amax * 1.5)
+            ax1.set_ylim(-self._amax * 1.5, self._amax * 1.5)
+
+            ax2 = fig.add_subplot(132)
+            ax2.grid(False)
+            ax2.pcolormesh(theta[:-1] * 180. / np.pi, rad[:-1], density, vmin = dmin, vmax = dmax)
+            ax2.set_xlabel('$\\theta$ [$^\circ$]')
+            ax2.set_ylabel('r [$^{\prime\prime}$]')
+
+            ax3 = fig.add_subplot(133, polar=True)
+            ax3.grid(False)
+            ax3.set_theta_zero_location('N')
+            ax3.pcolormesh(theta[:-1], rad[:-1], density, vmin = dmin, vmax = dmax)
+            ax3.set_yticklabels([])
+            plt.tight_layout()
+            plt.show()
 
     def debug(self, **kwargs):
         """
         debugging and plot things
         """
-        self.go(**kwargs)
+        self.go(plot = False, **kwargs)
         r = np.linspace(self._amin, self._amax, num = self._nr)
 
         fig = plt.figure(figsize=(7,7))
         ax1 = fig.add_axes([0.14, 0.14, 0.8, 0.8])
         ax1.set_aspect('equal')
         ax1.plot(0., 0., marker = '+', color = 'r', ms = 12, mew = 2., zorder = 3)
-        # cb1 = plt.imshow(self._azimuth, origin = 'lower', extent = [self._xlim, -self._xlim, -self._xlim, self._xlim])
+        cb1 = plt.imshow(self._azimuth, origin = 'lower', extent = [self._xlim, -self._xlim, -self._xlim, self._xlim])
         # plt.contour(self._azimuth, origin = 'lower', extent = [self._xlim, -self._xlim, -self._xlim, self._xlim], levels = self._nt, colors = 'w')
-        cb1 = plt.imshow(self._distance, origin = 'lower', extent = [self._xlim, -self._xlim, -self._xlim, self._xlim])
-        # for i in range(len(r)):
-        #     xn, yn, theta = self._get_xy(r[i], np.linspace(-np.pi, np.pi, num = self._nt, endpoint = True))
-        #     # ax1.plot(xn, yn, marker = 'o', mec = 'w', mfc = 'w', ms = 4, ls = ' ')
-        #     cb2 = ax1.scatter(xn, yn, c = theta, s = 6)
-        # ax1.set_xlim()
-        # ax1.set_ylim()
+        # cb1 = plt.imshow(self._distance, origin = 'lower', extent = [self._xlim, -self._xlim, -self._xlim, self._xlim])
+        for i in range(len(r)):
+            xn, yn, theta = self._get_xy(r[i], np.linspace(-np.pi, np.pi, num = self._nt, endpoint = True))
+            # ax1.plot(xn, yn, marker = 'o', mec = 'w', mfc = 'w', ms = 4, ls = ' ')
+            cb2 = ax1.scatter(xn, yn, c = theta, s = 6)
         # ax1.set_xlabel()
         # ax1.set_ylabel()
         divider = make_axes_locatable(ax1)
