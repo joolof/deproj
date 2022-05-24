@@ -230,8 +230,8 @@ if __name__ == '__main__':
     # test.go(amin = 0.15, amax = 0.8, incl = 82.00, pa = -60.61)
 
     test = Deproj('data_example/HR4796_Qphi_400.fits', nr = 30, nt = 60, pixscale = 0.0072)
-    test.go(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59)
-    # test.debug(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59)
+    # test.go(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59)
+    test.debug(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59)
 
     # test = Deproj('test/HD121617_Qphi_500.fits', nr = 40, nt = 60)
     # test.go(amin = 0.3, amax = 1.2, incl = 44.6, pa = -118.78)

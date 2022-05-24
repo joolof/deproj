@@ -19,7 +19,53 @@ and you can then import the class with
 from deproj import Deproj
 ```
 
+## First example
+
+There are very few parameters that you need to provide to get the deprojected map. Here's a quick use example
+
+```
+disk = Deproj('data_example/HR4796_Qphi_400.fits', nr = 30, nt = 60, pixscale = 0.0072)
+```
+
+You need to provide at least the name of the fits file with the observations, and then there are the following optional parameters that you can pass:
+
+```
+nr = 30           # Number of radial bins
+nt = 60           # Number of azimuthal bins
+pixscale = 0.0072 # Size of one pixel in arcsec
+```
+
+Afterwards, you can call the main method as
+
+```
+disk.go(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59)
+```
+
+where the parameters are
+
+```
+amin = 0.7        # The inner radius of the mask
+amax = 1.3        # The outer radius of the mask
+incl = 77.72      # The inclination of the disk
+pa = -151.59      # The position angle of the disk
+```
+
+and this will produce the feollowing output:
+
 ![HR4796](screenshots/HR4796.png)
+
+To help you better visualize how this works you can also call the following method
+
+```
+disk.debug(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59)
+```
+
+which will produce the output below
+
+![debug](screenshots/debug.png)
+
+where you can see on the left the distance in the midplane, with the contours showing the inner and outer radii of the mask, while the right panel shows the azimuthal angle in the midplane.
+
 
 Work in progress, more later on
 
