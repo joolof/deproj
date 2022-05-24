@@ -45,15 +45,16 @@ class Deproj():
         Main method to compute the things
         """
         self._check_parameters(kwargs)
-        plot = True
+        plot, cmap = True, 'viridis'
         if 'plot' in kwargs:
             plot = kwargs['plot']
+        if 'cmap' in kwargs:
+            cmap = kwargs['cmap']
         self._xm = ((np.cos(self._pa) * self._Xin + np.sin(self._pa) * self._Yin))
         self._ym = ((np.sin(self._pa) * self._Xin - np.cos(self._pa) * self._Yin)) / np.cos(self._incl)
         self._distance = np.sqrt(self._xm**2. + self._ym**2.)
         self._azimuth = (np.arctan2(self._ym,self._xm) + np.pi/2.) % (2. * np.pi) - np.pi
-        self._azimuth *= -1
-        # self._azimuth = np.arctan2(self._ym, self._xm)
+        self._azimuth *= -1 # from clockwise to counter-clockwise because reasons
 
         rad = np.linspace(self._amin, self._amax, num = self._nr+1)
         theta = np.linspace(-np.pi, np.pi, num = self._nt+1)
@@ -76,7 +77,7 @@ class Deproj():
             """
             fig = plt.figure(figsize=(15., 5.))
             ax1 = fig.add_subplot(131)
-            ax1.imshow(self._qphi, origin='lower', extent = [self._xlim, -self._xlim, -self._xlim, self._xlim], vmin = qmin, vmax = qmax)
+            ax1.imshow(self._qphi, origin='lower', extent = [self._xlim, -self._xlim, -self._xlim, self._xlim], vmin = qmin, vmax = qmax, cmap = cmap)
             ax1.set_xlabel('$\\alpha$ [$^{\prime\prime}$]')
             ax1.set_ylabel('$\delta$ [$^{\prime\prime}$]')
             ax1.set_xlim(self._amax, -self._amax)
@@ -84,7 +85,7 @@ class Deproj():
 
             ax2 = fig.add_subplot(132)
             ax2.grid(False)
-            ax2.pcolormesh(theta[:-1] * 180. / np.pi, rad[:-1], density, vmin = dmin, vmax = dmax)
+            ax2.pcolormesh(theta[:-1] * 180. / np.pi, rad[:-1], density, vmin = dmin, vmax = dmax, cmap = cmap)
             ax2.set_xlabel('$\\theta$ [$^\circ$]')
             ax2.set_ylabel('r [$^{\prime\prime}$]')
 
@@ -92,7 +93,7 @@ class Deproj():
             ax3.grid(False)
             ax3.set_theta_zero_location('N')
             ax3.set_theta_direction(-1)
-            ax3.pcolormesh(theta[:-1], rad[:-1], density, vmin = dmin, vmax = dmax)
+            ax3.pcolormesh(theta[:-1], rad[:-1], density, vmin = dmin, vmax = dmax, cmap = cmap)
             ax3.set_xticks(np.linspace(np.pi, -np.pi, 8, endpoint=False))
             ax3.set_thetalim(-np.pi, np.pi)
             ax3.set_yticklabels([])
@@ -220,13 +221,6 @@ class Deproj():
     def omega(self, omega):
         self._omega = omega * np.pi / 180.
 
-#     plt.figure(figsize = (7,7))
-#     cb = plt.imshow(distance, origin = 'lower', extent = [xlim, -xlim, -xlim, xlim]) # The axis should now be in arcsec as well
-#     plt.contour(distance, origin = 'lower', extent = [xlim, -xlim, -xlim, xlim], colors = 'w', linestyles = '--', levels = [0.5, 1.0, 1.5])
-#     plt.plot(xn, yn, color='r')
-#     plt.colorbar(cb)
-#     plt.show()
-
 """
 Plot the points
 """
@@ -236,8 +230,8 @@ if __name__ == '__main__':
     # test.go(amin = 0.15, amax = 0.8, incl = 82.00, pa = -60.61)
 
     test = Deproj('data_example/HR4796_Qphi_400.fits', nr = 30, nt = 60, pixscale = 0.0072)
-    # test.go(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59)
-    test.debug(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59)
+    test.go(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59)
+    # test.debug(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59)
 
     # test = Deproj('test/HD121617_Qphi_500.fits', nr = 40, nt = 60)
     # test.go(amin = 0.3, amax = 1.2, incl = 44.6, pa = -118.78)

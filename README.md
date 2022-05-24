@@ -10,7 +10,7 @@ Work in progress, more later on
 
 ## To be done
 
-- [ ] Install script
+- [x] Install script
 - [ ] Additional parameters for the plotting, `vmin`, `vmax`, `xlim`, `cmap` etc
 - [ ] Plotting options, only `polar`, only `cartesian`, `full`, etc
 - [ ] Provide either a file name, or a 2D frame directly
