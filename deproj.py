@@ -78,8 +78,8 @@ class Deproj():
             ax1.imshow(self._qphi, origin='lower', extent = [self._xlim, -self._xlim, -self._xlim, self._xlim], vmin = qmin, vmax = qmax)
             ax1.set_xlabel('$\\alpha$ [$^{\prime\prime}$]')
             ax1.set_ylabel('$\delta$ [$^{\prime\prime}$]')
-            ax1.set_xlim(self._amax * 1.5, -self._amax * 1.5)
-            ax1.set_ylim(-self._amax * 1.5, self._amax * 1.5)
+            ax1.set_xlim(self._amax, -self._amax)
+            ax1.set_ylim(-self._amax, self._amax)
 
             ax2 = fig.add_subplot(132)
             ax2.grid(False)
@@ -241,9 +241,9 @@ if __name__ == '__main__':
     # test = Deproj('test/HD129590_Qphi_300.fits', nr = 11, nt = 30)
     # test.go(amin = 0.15, amax = 0.8, incl = 82.00, pa = -60.61)
 
-    # test = Deproj('test/HR4796_Qphi_400.fits', nr = 30, nt = 60, pixscale = 0.0072)
-    # test.go(amin = 0.6, amax = 1.5, incl = 77.72, pa = -151.59)
+    test = Deproj('data_example/HR4796_Qphi_400.fits', nr = 30, nt = 60, pixscale = 0.0072)
+    test.go(amin = 0.6, amax = 1.4, incl = 77.72, pa = -151.59)
 
-    test = Deproj('test/HD121617_Qphi_500.fits', nr = 40, nt = 60)
-    test.go(amin = 0.3, amax = 1.2, incl = 44.6, pa = -118.78)
-    # test.debug(amin = 0.5, amax = 1.5, incl = 80.6, pa = 10., omega = 0.)
+    # test = Deproj('test/HD121617_Qphi_500.fits', nr = 40, nt = 60)
+    # test.go(amin = 0.3, amax = 1.2, incl = 44.6, pa = -118.78)
+    # # test.debug(amin = 0.5, amax = 1.5, incl = 80.6, pa = 10., omega = 0.)
