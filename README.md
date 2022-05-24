@@ -56,7 +56,7 @@ and this will produce the feollowing output:
 
 To help you better visualize how this works you can also call the following method
 
-```
+```python
 disk.debug(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59)
 ```
 
