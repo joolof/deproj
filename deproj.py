@@ -52,6 +52,7 @@ class Deproj():
         self._ym = ((np.sin(self._pa) * self._Xin - np.cos(self._pa) * self._Yin)) / np.cos(self._incl)
         self._distance = np.sqrt(self._xm**2. + self._ym**2.)
         self._azimuth = (np.arctan2(self._ym,self._xm) + np.pi/2.) % (2. * np.pi) - np.pi
+        self._azimuth *= -1
         # self._azimuth = np.arctan2(self._ym, self._xm)
 
         rad = np.linspace(self._amin, self._amax, num = self._nr+1)
@@ -90,7 +91,10 @@ class Deproj():
             ax3 = fig.add_subplot(133, polar=True)
             ax3.grid(False)
             ax3.set_theta_zero_location('N')
+            ax3.set_theta_direction(-1)
             ax3.pcolormesh(theta[:-1], rad[:-1], density, vmin = dmin, vmax = dmax)
+            ax3.set_xticks(np.linspace(np.pi, -np.pi, 8, endpoint=False))
+            ax3.set_thetalim(-np.pi, np.pi)
             ax3.set_yticklabels([])
             plt.tight_layout()
             plt.show()
@@ -109,33 +113,12 @@ class Deproj():
         cb1 = plt.imshow(self._azimuth, origin = 'lower', extent = [self._xlim, -self._xlim, -self._xlim, self._xlim])
         # plt.contour(self._azimuth, origin = 'lower', extent = [self._xlim, -self._xlim, -self._xlim, self._xlim], levels = self._nt, colors = 'w')
         # cb1 = plt.imshow(self._distance, origin = 'lower', extent = [self._xlim, -self._xlim, -self._xlim, self._xlim])
-        for i in range(len(r)):
-            xn, yn, theta = self._get_xy(r[i], np.linspace(-np.pi, np.pi, num = self._nt, endpoint = True))
-            # ax1.plot(xn, yn, marker = 'o', mec = 'w', mfc = 'w', ms = 4, ls = ' ')
-            cb2 = ax1.scatter(xn, yn, c = theta, s = 6)
         # ax1.set_xlabel()
         # ax1.set_ylabel()
         divider = make_axes_locatable(ax1)
         cax = divider.append_axes("right", size="5%", pad=0.05)
         plt.colorbar(cb1, cax=cax)
         plt.show()
-
-    def _get_xy(self, a, nu):
-        """
-        All six orbital parameters
-        """
-        r = a * (1.0 - self._e**2.) / (1.0 + self._e * np.cos(nu))
-        x = r * np.cos(nu)
-        y = r * np.sin(nu)
-
-        # Now, we need to apply some projection and rotation
-        yn = x*(np.cos(self._pa)*np.cos(self._omega) - np.sin(self._omega)*np.cos(self._incl)*np.sin(self._pa)) -\
-             y*(np.sin(self._omega)*np.cos(self._pa) +np.cos(self._omega)*np.cos(self._incl)*np.sin(self._pa))
-        xn = x*(np.sin(self._pa)*np.cos(self._omega) + np.sin(self._omega)*np.cos(self._incl)*np.cos(self._pa)) +\
-             y*(np.cos(self._omega)*np.cos(self._incl)*np.cos(self._pa) - np.sin(self._omega)*np.sin(self._pa))
-        # The minus in front of xn is to flip the x axis and put the East on the left
-        # The minus in front of nu is to have positive angles on the front side of the disk
-        return -xn, yn, -nu
 
     def _read_fits(self, qfile):
         """
@@ -242,7 +225,8 @@ if __name__ == '__main__':
     # test.go(amin = 0.15, amax = 0.8, incl = 82.00, pa = -60.61)
 
     test = Deproj('data_example/HR4796_Qphi_400.fits', nr = 30, nt = 60, pixscale = 0.0072)
-    test.go(amin = 0.6, amax = 1.4, incl = 77.72, pa = -151.59)
+    test.go(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59)
+    # test.debug(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59)
 
     # test = Deproj('test/HD121617_Qphi_500.fits', nr = 40, nt = 60)
     # test.go(amin = 0.3, amax = 1.2, incl = 44.6, pa = -118.78)
