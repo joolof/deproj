@@ -103,21 +103,32 @@ class Deproj():
         """
         debugging and plot things
         """
-        self.go(plot = False, **kwargs)
-        r = np.linspace(self._amin, self._amax, num = self._nr)
+        self.go(plot = False, **kwargs) # Just to get some of the variables
 
-        fig = plt.figure(figsize=(7,7))
-        ax1 = fig.add_axes([0.14, 0.14, 0.8, 0.8])
+        fig = plt.figure(figsize=(10., 4.5))
+        ax1 = fig.add_subplot(121)
         ax1.set_aspect('equal')
-        ax1.plot(0., 0., marker = '+', color = 'r', ms = 12, mew = 2., zorder = 3)
-        cb1 = plt.imshow(self._azimuth, origin = 'lower', extent = [self._xlim, -self._xlim, -self._xlim, self._xlim])
-        # plt.contour(self._azimuth, origin = 'lower', extent = [self._xlim, -self._xlim, -self._xlim, self._xlim], levels = self._nt, colors = 'w')
-        # cb1 = plt.imshow(self._distance, origin = 'lower', extent = [self._xlim, -self._xlim, -self._xlim, self._xlim])
-        # ax1.set_xlabel()
-        # ax1.set_ylabel()
+        ax1.plot(0., 0., marker = '+', color = 'w', ms = 8, mew = 2., zorder = 3)
+        cb1 = ax1.imshow(self._distance, origin = 'lower', extent = [self._xlim, -self._xlim, -self._xlim, self._xlim])
+        CS = ax1.contour(self._distance, origin = 'lower', extent = [self._xlim, -self._xlim, -self._xlim, self._xlim], levels=[self._amin, self._amax], colors = 'w', linewidths=1)
+        ax1.clabel(CS, inline=True, fontsize=8)
+        ax1.set_xlabel('$\\alpha$ [$^{\prime\prime}$]')
+        ax1.set_ylabel('$\delta$ [$^{\prime\prime}$]')
+        ax1.set_title('Midplane distance [$^{\prime\prime}$]', fontdict={'fontsize':10})
         divider = make_axes_locatable(ax1)
         cax = divider.append_axes("right", size="5%", pad=0.05)
         plt.colorbar(cb1, cax=cax)
+
+        ax2 = fig.add_subplot(122)
+        ax2.set_aspect('equal')
+        ax2.plot(0., 0., marker = '+', color = 'w', ms = 8, mew = 2., zorder = 3)
+        cb1 = ax2.imshow(self._azimuth * 180./np.pi, origin = 'lower', extent = [self._xlim, -self._xlim, -self._xlim, self._xlim])
+        ax2.set_xlabel('$\\alpha$ [$^{\prime\prime}$]')
+        ax2.set_title('Midplane azimuth [$^\circ$]', fontdict={'fontsize':10})
+        divider = make_axes_locatable(ax2)
+        cax = divider.append_axes("right", size="5%", pad=0.05)
+        plt.colorbar(cb1, cax=cax)
+        plt.tight_layout()
         plt.show()
 
     def _read_fits(self, qfile):
@@ -225,8 +236,8 @@ if __name__ == '__main__':
     # test.go(amin = 0.15, amax = 0.8, incl = 82.00, pa = -60.61)
 
     test = Deproj('data_example/HR4796_Qphi_400.fits', nr = 30, nt = 60, pixscale = 0.0072)
-    test.go(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59)
-    # test.debug(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59)
+    # test.go(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59)
+    test.debug(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59)
 
     # test = Deproj('test/HD121617_Qphi_500.fits', nr = 40, nt = 60)
     # test.go(amin = 0.3, amax = 1.2, incl = 44.6, pa = -118.78)
