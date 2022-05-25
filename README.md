@@ -19,6 +19,8 @@ and you can then import the class with
 from deproj import Deproj
 ```
 
+The dependencies are `numpy`, `astropy`, and `matplotlib`.
+
 ## First example
 
 There are very few parameters that you need to provide to get the deprojected map. Here's a quick use example
@@ -50,7 +52,7 @@ incl = 77.72      # The inclination of the disk
 pa = -151.59      # The position angle of the disk
 ```
 
-and this will produce the feollowing output:
+and this will produce the following output:
 
 ![HR4796](screenshots/HR4796.png)
 
@@ -70,7 +72,7 @@ where you can see on the left the distance in the midplane, with the contours sh
 ## To be done
 
 - [x] Install script
-- [ ] Additional parameters for the plotting, `vmin`, `vmax`, `xlim`, `cmap` etc
+- [x] Additional parameters for the plotting, `vmin`, `vmax`, `xlim`, `cmap` etc
 - [ ] Plotting options, only `polar`, only `cartesian`, `full`, etc
 - [ ] Provide either a file name, or a 2D frame directly
 - [ ] Automatic determination of the inclination and position angle? It would increase the dependencies required though.

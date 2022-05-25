@@ -1,6 +1,5 @@
 import os
 import sys
-import logging
 import numpy as np
 from astropy.io import fits
 import matplotlib.pyplot as plt
@@ -12,20 +11,19 @@ class Deproj():
     """
     docstring for Deproj
     """
-    def __init__(self, qfile, pixscale = 0.01226, plane = 'disk', nr = 10, nt = 36):
+    def __init__(self, qfile, pixscale = 0.01226, plane = 'disk', nr = 30, nt = 60):
         """
-        Class to deproject observations of a debris disk
+        Class to deproject observations of a debris disk.
+
+        You should provide:
+          + name of a fits file (mandatory)
+          + pixscale: size of one pixel in arcsec (default 0.01226)
+          + nr: number of radial bins (default 10)
+          + nt: number of azimuthal bins (default 60)
         """
         self._pixscale = pixscale
         self._nr, self._nt = nr, nt
         self._amin, self._amax, self._incl, self._pa, self._e, self._omega = 0.5, 1.5, 45. * np.pi/180., 0., 0., 0.
-        """
-        Configure the logging module
-        """
-        logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s',
-            handlers=[
-                logging.StreamHandler()
-            ])
         self._nx, self._qphi = self._read_fits(qfile)
         """
         Get the coordinates of the center, different if the number
@@ -43,13 +41,35 @@ class Deproj():
     def go(self, **kwargs):
         """
         Main method to compute the things
+
+        You should provide the following input parameters:
+          + amin: minimum separation (in arcsec)
+          + amax: maximum separation (in arcsec)
+          + incl: inclination (in degrees)
+          + pa: position angle (in degrees)
+
+        Additionally, there are the following optional parameters
+          + cmap: a color map (default is viridis)
+          + vmin: lower percentile (default 1%)
+          + vmax: upper percentile (default 99.5%)
+          + xlim: max distance when plotting the observations
         """
         self._check_parameters(kwargs)
         plot, cmap = True, 'viridis'
+        vmin, vmax = 1., 99.5
         if 'plot' in kwargs:
             plot = kwargs['plot']
         if 'cmap' in kwargs:
             cmap = kwargs['cmap']
+        if 'vmin' in kwargs:
+            vmin = kwargs['vmin']
+        if 'vmax' in kwargs:
+            vmax = kwargs['vmax']
+        if 'xlim' in kwargs:
+            self._xlim = kwargs['xlim']
+        """
+        Do the thing
+        """
         self._xm = ((np.cos(self._pa) * self._Xin + np.sin(self._pa) * self._Yin))
         self._ym = ((np.sin(self._pa) * self._Xin - np.cos(self._pa) * self._Yin)) / np.cos(self._incl)
         self._distance = np.sqrt(self._xm**2. + self._ym**2.)
@@ -68,10 +88,10 @@ class Deproj():
             """
             Set the cuts
             """
-            dmin = np.nanpercentile(density, 1.)
-            dmax = np.nanpercentile(density, 99.5)
-            qmin = np.nanpercentile(self._qphi, 1.)
-            qmax = np.nanpercentile(self._qphi, 99.5)
+            dmin = np.nanpercentile(density, vmin)
+            dmax = np.nanpercentile(density, vmax)
+            qmin = np.nanpercentile(self._qphi, vmin)
+            qmax = np.nanpercentile(self._qphi, vmax)
             """
             Make the plot
             """
@@ -80,8 +100,8 @@ class Deproj():
             ax1.imshow(self._qphi, origin='lower', extent = [self._xlim, -self._xlim, -self._xlim, self._xlim], vmin = qmin, vmax = qmax, cmap = cmap)
             ax1.set_xlabel('$\\alpha$ [$^{\prime\prime}$]')
             ax1.set_ylabel('$\delta$ [$^{\prime\prime}$]')
-            ax1.set_xlim(self._amax, -self._amax)
-            ax1.set_ylim(-self._amax, self._amax)
+            ax1.set_xlim(self._xlim, -self._xlim)
+            ax1.set_ylim(-self._xlim, self._xlim)
 
             ax2 = fig.add_subplot(132)
             ax2.grid(False)
@@ -102,7 +122,13 @@ class Deproj():
 
     def debug(self, **kwargs):
         """
-        debugging and plot things
+        Method to plot the midplane distance and azimuthal angle.
+
+        You should provide the following input parameters:
+          + amin: minimum separation (in arcsec)
+          + amax: maximum separation (in arcsec)
+          + incl: inclination (in degrees)
+          + pa: position angle (in degrees)
         """
         self.go(plot = False, **kwargs) # Just to get some of the variables
 
@@ -153,7 +179,7 @@ class Deproj():
         """
         Method to print some error message
         """
-        logging.error(message)
+        print(message)
         sys.exit(0)
 
     def _check_parameters(self, kwargs):
@@ -230,8 +256,8 @@ if __name__ == '__main__':
     # test.go(amin = 0.15, amax = 0.8, incl = 82.00, pa = -60.61)
 
     test = Deproj('data_example/HR4796_Qphi_400.fits', nr = 30, nt = 60, pixscale = 0.0072)
-    # test.go(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59)
-    test.debug(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59)
+    test.go(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59)
+    # test.debug(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59)
 
     # test = Deproj('test/HD121617_Qphi_500.fits', nr = 40, nt = 60)
     # test.go(amin = 0.3, amax = 1.2, incl = 44.6, pa = -118.78)
