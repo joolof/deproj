@@ -29,7 +29,7 @@ There are very few parameters that you need to provide to get the deprojected ma
 disk = Deproj('data_example/HR4796_Qphi_400.fits', nr = 30, nt = 60, pixscale = 0.0072)
 ```
 
-You need to provide at least the name of the fits file with the observations, and then there are the following optional parameters that you can pass:
+The first argument should either be the name of the fits file containing the observations or directly a 2D array. The observations should have the same number of pixels in both directions. Then, there are the following optional parameters that you can pass:
 
 ```python
 nr = 30           # Number of radial bins
@@ -76,7 +76,11 @@ which will produce the output below
 
 ![debug](screenshots/debug.png)
 
-where you can see on the left the distance in the midplane, with the contours showing the inner and outer radii of the mask, while the right panel shows the azimuthal angle in the midplane.
+where you can see on the left the distance in the midplane, with the contours showing the inner and outer radii of the mask, while the right panel shows the azimuthal angle in the midplane. The distance map will be binned in `nr` cells, and the azimuth map will be binned in `nt` cells. Since the inclination and position angle of the disk is accounting for in both maps, the deprojection is quite straightforward to do.
+
+## Words of caution
+
+The quality of the deprojection will depend on the values for the inclination and position angle that you provide. As you can see in the example above, the deprojected disk does not appear to be very circular. There are two explanations for this, the first one being that the disk has a known eccentricity, which is not accounted for in this package. The second one is that the disk is assumed to be infinitely flat. That example uses the values derived in Olofsson et al. (2022) where we fitted for the vertical scale height of the disk. As further discussed in Olofsson et al. (2020), this can have an impact on your results.
 
 
 ## To be done
@@ -84,7 +88,7 @@ where you can see on the left the distance in the midplane, with the contours sh
 - [x] Install script
 - [x] Additional parameters for the plotting, `vmin`, `vmax`, `xlim`, `cmap` etc
 - [x] Plotting options, only `polar`, only `cartesian`, `full`, etc
-- [ ] Provide either a file name, or a 2D frame directly
+- [x] Provide either a file name, or a 2D frame directly
 - [ ] Automatic determination of the inclination and position angle? It would increase the dependencies required though.
 
 

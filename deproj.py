@@ -24,7 +24,7 @@ class Deproj():
         self._pixscale = pixscale
         self._nr, self._nt = nr, nt
         self._amin, self._amax, self._incl, self._pa, self._e, self._omega = 0.5, 1.5, 45. * np.pi/180., 0., 0., 0.
-        self._nx, self._qphi = self._read_fits(qfile)
+        self._nx, self._data = self._read_fits(qfile)
         """
         Get the coordinates of the center, different if the number
         of pixels is odd or even
@@ -87,7 +87,7 @@ class Deproj():
         for ir in range(self._nr):
             for it in range(self._nt):
                 sel = ((self._distance >= rad[ir]) & (self._distance < rad[ir+1]) & (self._azimuth >= theta[it]) & (self._azimuth < theta[it+1]))
-                self.density[ir, it] = np.median(self._qphi[sel])
+                self.density[ir, it] = np.median(self._data[sel])
 
         if doplot:
             """
@@ -95,15 +95,15 @@ class Deproj():
             """
             dmin = np.nanpercentile(self.density, vmin)
             dmax = np.nanpercentile(self.density, vmax)
-            qmin = np.nanpercentile(self._qphi, vmin)
-            qmax = np.nanpercentile(self._qphi, vmax)
+            qmin = np.nanpercentile(self._data, vmin)
+            qmax = np.nanpercentile(self._data, vmax)
             """
             Make the plot
             """
             if plot == 'full':
                 fig = plt.figure(figsize=(15., 5.))
                 ax1 = fig.add_subplot(131)
-                ax1.imshow(self._qphi, origin='lower', extent = [self._xlim, -self._xlim, -self._xlim, self._xlim], vmin = qmin, vmax = qmax, cmap = cmap)
+                ax1.imshow(self._data, origin='lower', extent = [self._xlim, -self._xlim, -self._xlim, self._xlim], vmin = qmin, vmax = qmax, cmap = cmap)
                 ax1.set_xlabel('$\\alpha$ [$^{\prime\prime}$]')
                 ax1.set_ylabel('$\delta$ [$^{\prime\prime}$]')
                 ax1.set_xlim(self._xlim, -self._xlim)
@@ -187,9 +187,22 @@ class Deproj():
         """
         Method to read the fits file
         """
-        if os.path.isfile(qfile):
-            hdu = fits.open(qfile)
-            data = hdu[0].data
+        if type(qfile) is str:
+            if os.path.isfile(qfile):
+                hdu = fits.open(qfile)
+                data = hdu[0].data
+                hdu.close()
+                if len(np.shape(data)) != 2:
+                    self._error_msg('Problem with the shape of the data: {}'.format(np.shape(data)))
+                else:
+                    if np.shape(data)[0] != np.shape(data)[1]:
+                        self._error_msg('Not a square image, not sure if that would work ...')
+                    else:
+                        return np.shape(data)[0], data
+            else:
+                self._error_msg('Could not find the file')
+        elif type(qfile) is np.ndarray:
+            data = qfile
             if len(np.shape(data)) != 2:
                 self._error_msg('Problem with the shape of the data: {}'.format(np.shape(data)))
             else:
@@ -198,7 +211,7 @@ class Deproj():
                 else:
                     return np.shape(data)[0], data
         else:
-            self._error_msg('Could not find the file')
+            self._error_msg('The data should either be the name of a fits file or a 2D array.')
 
     def _error_msg(self, message):
         """
