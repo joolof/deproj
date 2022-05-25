@@ -56,6 +56,16 @@ and this will produce the following output:
 
 ![HR4796](screenshots/HR4796.png)
 
+There are additional parameters that can be passed to the `go` method:
+
+```python
+vmin = 1.         # The lower percentile for vmin
+vmax = 99.5       # The upper percentile for vmin
+cmap = 'viridis'  # The colormap
+xlim = 1.1        # The extent when plotting the observations (in arcsec)
+plot = 'full'     # What to plot, can be either 'full', 'polar', or 'cartesian'
+```
+
 To help you better visualize how this works you can also call the following method
 
 ```python
