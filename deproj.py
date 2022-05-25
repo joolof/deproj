@@ -36,6 +36,7 @@ class Deproj():
         self._Xin, self._Yin = (np.mgrid[0:self._nx, 0:self._nx] - self._cx) * self._pixscale
         self._xm, self._ym = np.zeros((self._nx, self._nx)), np.zeros((self._nx, self._nx))
         self._distance, self._azimuth = np.zeros((self._nx, self._nx)), np.zeros((self._nx, self._nx))
+        self.density = np.zeros((self._nr, self._nt))
         self._xlim = self._cx * self._pixscale
 
     def go(self, **kwargs):
@@ -53,12 +54,17 @@ class Deproj():
           + vmin: lower percentile (default 1%)
           + vmax: upper percentile (default 99.5%)
           + xlim: max distance when plotting the observations
+          + plot: 'full', 'polar', 'cartesian'
         """
         self._check_parameters(kwargs)
-        plot, cmap = True, 'viridis'
+        doplot, plot, cmap = True, 'full', 'viridis'
         vmin, vmax = 1., 99.5
+        if 'doplot' in kwargs:
+            doplot = kwargs['doplot']
         if 'plot' in kwargs:
             plot = kwargs['plot']
+            if (plot != 'full') and (plot != 'polar') and (plot != 'cartesian'):
+                self._error_msg('The \'plot\' variable should be either \'full\', \'polar\', or \'cartesian\'.')
         if 'cmap' in kwargs:
             cmap = kwargs['cmap']
         if 'vmin' in kwargs:
@@ -78,47 +84,66 @@ class Deproj():
 
         rad = np.linspace(self._amin, self._amax, num = self._nr+1)
         theta = np.linspace(-np.pi, np.pi, num = self._nt+1)
-        density = np.zeros((self._nr, self._nt))
         for ir in range(self._nr):
             for it in range(self._nt):
                 sel = ((self._distance >= rad[ir]) & (self._distance < rad[ir+1]) & (self._azimuth >= theta[it]) & (self._azimuth < theta[it+1]))
-                density[ir, it] = np.median(self._qphi[sel])
+                self.density[ir, it] = np.median(self._qphi[sel])
 
-        if plot:
+        if doplot:
             """
             Set the cuts
             """
-            dmin = np.nanpercentile(density, vmin)
-            dmax = np.nanpercentile(density, vmax)
+            dmin = np.nanpercentile(self.density, vmin)
+            dmax = np.nanpercentile(self.density, vmax)
             qmin = np.nanpercentile(self._qphi, vmin)
             qmax = np.nanpercentile(self._qphi, vmax)
             """
             Make the plot
             """
-            fig = plt.figure(figsize=(15., 5.))
-            ax1 = fig.add_subplot(131)
-            ax1.imshow(self._qphi, origin='lower', extent = [self._xlim, -self._xlim, -self._xlim, self._xlim], vmin = qmin, vmax = qmax, cmap = cmap)
-            ax1.set_xlabel('$\\alpha$ [$^{\prime\prime}$]')
-            ax1.set_ylabel('$\delta$ [$^{\prime\prime}$]')
-            ax1.set_xlim(self._xlim, -self._xlim)
-            ax1.set_ylim(-self._xlim, self._xlim)
+            if plot == 'full':
+                fig = plt.figure(figsize=(15., 5.))
+                ax1 = fig.add_subplot(131)
+                ax1.imshow(self._qphi, origin='lower', extent = [self._xlim, -self._xlim, -self._xlim, self._xlim], vmin = qmin, vmax = qmax, cmap = cmap)
+                ax1.set_xlabel('$\\alpha$ [$^{\prime\prime}$]')
+                ax1.set_ylabel('$\delta$ [$^{\prime\prime}$]')
+                ax1.set_xlim(self._xlim, -self._xlim)
+                ax1.set_ylim(-self._xlim, self._xlim)
 
-            ax2 = fig.add_subplot(132)
-            ax2.grid(False)
-            ax2.pcolormesh(theta[:-1] * 180. / np.pi, rad[:-1], density, vmin = dmin, vmax = dmax, cmap = cmap)
-            ax2.set_xlabel('$\\theta$ [$^\circ$]')
-            ax2.set_ylabel('r [$^{\prime\prime}$]')
+                ax2 = fig.add_subplot(132)
+                ax2.grid(False)
+                ax2.pcolormesh(theta[:-1] * 180. / np.pi, rad[:-1], self.density, vmin = dmin, vmax = dmax, cmap = cmap)
+                ax2.set_xlabel('$\\theta$ [$^\circ$]')
+                ax2.set_ylabel('r [$^{\prime\prime}$]')
 
-            ax3 = fig.add_subplot(133, polar=True)
-            ax3.grid(False)
-            ax3.set_theta_zero_location('N')
-            ax3.set_theta_direction(-1)
-            ax3.pcolormesh(theta[:-1], rad[:-1], density, vmin = dmin, vmax = dmax, cmap = cmap)
-            ax3.set_xticks(np.linspace(np.pi, -np.pi, 8, endpoint=False))
-            ax3.set_thetalim(-np.pi, np.pi)
-            ax3.set_yticklabels([])
-            plt.tight_layout()
-            plt.show()
+                ax3 = fig.add_subplot(133, polar=True)
+                ax3.grid(False)
+                ax3.set_theta_zero_location('N')
+                ax3.set_theta_direction(-1)
+                ax3.pcolormesh(theta[:-1], rad[:-1], self.density, vmin = dmin, vmax = dmax, cmap = cmap)
+                ax3.set_xticks(np.linspace(np.pi, -np.pi, 8, endpoint=False))
+                ax3.set_thetalim(-np.pi, np.pi)
+                ax3.set_yticklabels([])
+                plt.tight_layout()
+                plt.show()
+            elif plot == 'polar':
+                fig = plt.figure(figsize=(7,7))
+                ax1 = fig.add_axes([0.1, 0.1, 0.8, 0.8], polar = True)
+                ax1.grid(False)
+                ax1.set_theta_zero_location('N')
+                ax1.set_theta_direction(-1)
+                ax1.pcolormesh(theta[:-1], rad[:-1], self.density, vmin = dmin, vmax = dmax, cmap = cmap)
+                ax1.set_xticks(np.linspace(np.pi, -np.pi, 8, endpoint=False))
+                ax1.set_thetalim(-np.pi, np.pi)
+                ax1.set_yticklabels([])
+                plt.show()
+            else:
+                fig = plt.figure(figsize=(7,6))
+                ax1 = fig.add_axes([0.14, 0.14, 0.8, 0.8])
+                ax1.grid(False)
+                ax1.pcolormesh(theta[:-1], rad[:-1], self.density, vmin = dmin, vmax = dmax, cmap = cmap)
+                ax1.set_xlabel('$\\theta$ [$^\circ$]')
+                ax1.set_ylabel('r [$^{\prime\prime}$]')
+                plt.show()
 
     def debug(self, **kwargs):
         """
@@ -130,7 +155,7 @@ class Deproj():
           + incl: inclination (in degrees)
           + pa: position angle (in degrees)
         """
-        self.go(plot = False, **kwargs) # Just to get some of the variables
+        self.go(doplot = False, **kwargs) # Just to get some of the variables
 
         fig = plt.figure(figsize=(10., 4.5))
         ax1 = fig.add_subplot(121)
@@ -256,7 +281,7 @@ if __name__ == '__main__':
     # test.go(amin = 0.15, amax = 0.8, incl = 82.00, pa = -60.61)
 
     test = Deproj('data_example/HR4796_Qphi_400.fits', nr = 30, nt = 60, pixscale = 0.0072)
-    test.go(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59)
+    test.go(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59, plot = 'polar')
     # test.debug(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59)
 
     # test = Deproj('test/HD121617_Qphi_500.fits', nr = 40, nt = 60)
