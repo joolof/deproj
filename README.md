@@ -80,7 +80,7 @@ where you can see on the left the distance in the midplane, with the contours sh
 
 ## Words of caution
 
-The quality of the deprojection will depend on the values for the inclination and position angle that you provide. As you can see in the example above, the deprojected disk does not appear to be very circular. There are two explanations for this, the first one being that the disk has a known eccentricity, which is not accounted for in this package. The second one is that the disk is assumed to be infinitely flat. That example uses the values derived in Olofsson et al. (2022) where we fitted for the vertical scale height of the disk. As further discussed in Olofsson et al. (2020), this can have an impact on your results.
+The quality of the deprojection will depend on the values for the inclination and position angle that you provide. As you can see in the example above, the deprojected disk does not appear to be very circular. There are two explanations for this, the first one being that the disk has a known eccentricity, which is not accounted for in this package. The second one is that the disk is assumed to be infinitely flat. That example uses the values derived in [Olofsson et al. (2022)](https://ui.adsabs.harvard.edu/abs/2022MNRAS.513..713O/abstract) where we fitted for the vertical scale height of the disk. As further discussed in [Olofsson et al. (2020)](https://ui.adsabs.harvard.edu/abs/2020A%26A...640A..12O/abstract), this can have an impact on your results.
 
 
 ## To be done
