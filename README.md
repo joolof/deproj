@@ -62,7 +62,7 @@ There are additional parameters that can be passed to the `go` method:
 vmin = 1.         # The lower percentile for vmin
 vmax = 99.5       # The upper percentile for vmin
 cmap = 'viridis'  # The colormap
-xlim = 1.1        # The extent when plotting the observations (in arcsec)
+plim = 1.1        # The extent when plotting the observations (in arcsec)
 plot = 'full'     # What to plot, can be either 'full', 'polar', or 'cartesian'
 ```
 
@@ -86,7 +86,7 @@ The quality of the deprojection will depend on the values for the inclination an
 ## To be done
 
 - [x] Install script
-- [x] Additional parameters for the plotting, `vmin`, `vmax`, `xlim`, `cmap` etc
+- [x] Additional parameters for the plotting, `vmin`, `vmax`, `plim`, `cmap` etc
 - [x] Plotting options, only `polar`, only `cartesian`, `full`, etc
 - [x] Provide either a file name, or a 2D frame directly
 - [ ] Automatic determination of the inclination and position angle? It would increase the dependencies required though.

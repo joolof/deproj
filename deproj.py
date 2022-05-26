@@ -11,7 +11,7 @@ class Deproj():
     """
     docstring for Deproj
     """
-    def __init__(self, qfile, pixscale = 0.01226, plane = 'disk', nr = 30, nt = 60):
+    def __init__(self, qfile, pixscale = 0.01226, nr = 30, nt = 60):
         """
         Class to deproject observations of a debris disk.
 
@@ -71,8 +71,9 @@ class Deproj():
             vmin = kwargs['vmin']
         if 'vmax' in kwargs:
             vmax = kwargs['vmax']
-        if 'xlim' in kwargs:
-            self._xlim = kwargs['xlim']
+        plim = self._xlim
+        if 'plim' in kwargs:
+            plim = kwargs['plim']
         """
         Do the thing
         """
@@ -106,8 +107,8 @@ class Deproj():
                 ax1.imshow(self._data, origin='lower', extent = [self._xlim, -self._xlim, -self._xlim, self._xlim], vmin = qmin, vmax = qmax, cmap = cmap)
                 ax1.set_xlabel('$\\alpha$ [$^{\prime\prime}$]')
                 ax1.set_ylabel('$\delta$ [$^{\prime\prime}$]')
-                ax1.set_xlim(self._xlim, -self._xlim)
-                ax1.set_ylim(-self._xlim, self._xlim)
+                ax1.set_xlim(plim, -plim)
+                ax1.set_ylim(-plim, plim)
 
                 ax2 = fig.add_subplot(132)
                 ax2.grid(False)
@@ -291,12 +292,12 @@ Plot the points
 
 if __name__ == '__main__':
     # test = Deproj('test/HD129590_Qphi_300.fits', nr = 11, nt = 30)
-    # test.go(amin = 0.15, amax = 0.8, incl = 82.00, pa = -60.61)
+    # test.go(amin = 0.15, amax = 0.8, incl = 82.00, pa = -60.61, plot = 'cartesian')
 
-    test = Deproj('data_example/HR4796_Qphi_400.fits', nr = 30, nt = 60, pixscale = 0.0072)
-    test.go(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59, plot = 'polar')
+    # test = Deproj('data_example/HR4796_Qphi_400.fits', nr = 30, nt = 60, pixscale = 0.0072)
+    # test.go(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59, plot = 'polar')
     # test.debug(amin = 0.7, amax = 1.3, incl = 77.72, pa = -151.59)
 
-    # test = Deproj('test/HD121617_Qphi_500.fits', nr = 40, nt = 60)
-    # test.go(amin = 0.3, amax = 1.2, incl = 44.6, pa = -118.78)
+    test = Deproj('test/HD121617_Qphi_500.fits', nr = 30, nt = 60)
+    test.go(amin = 0.4, amax = 1.2, incl = 44.6, pa = -118.78, plot = 'full', plim = 1.2)
     # # test.debug(amin = 0.5, amax = 1.5, incl = 80.6, pa = 10., omega = 0.)
