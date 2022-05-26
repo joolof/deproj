@@ -146,7 +146,7 @@ class Deproj():
                 ax1.set_ylabel('r [$^{\prime\prime}$]')
                 plt.show()
 
-        return density
+        return self.density
 
     def debug(self, **kwargs):
         """
