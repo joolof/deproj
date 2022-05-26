@@ -146,6 +146,8 @@ class Deproj():
                 ax1.set_ylabel('r [$^{\prime\prime}$]')
                 plt.show()
 
+        return density
+
     def debug(self, **kwargs):
         """
         Method to plot the midplane distance and azimuthal angle.
