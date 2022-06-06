@@ -146,7 +146,7 @@ class Deproj():
                 ax1.set_ylabel('r [$^{\prime\prime}$]')
                 plt.show()
 
-        return self.density
+        return theta[:-1], rad[:-1], self.density
 
     def debug(self, **kwargs):
         """
@@ -235,10 +235,6 @@ class Deproj():
             self._incl = kwargs['incl'] * np.pi / 180.
         if 'pa' in kwargs:
             self._pa = -kwargs['pa'] * np.pi / 180.
-        if 'e' in kwargs:
-            self._e = kwargs['e']
-        if 'omega' in kwargs:
-            self._omega = kwargs['omega'] * np.pi / 180.
 
     @property
     def amin(self):
@@ -266,27 +262,11 @@ class Deproj():
 
     @property
     def pa(self):
-        return self._pa * 180. / np.pi
+        return -self._pa * 180. / np.pi
 
     @pa.setter
     def pa(self, pa):
-        self._pa = pa * np.pi / 180.
-
-    @property
-    def e(self):
-        return self._e
-
-    @e.setter
-    def e(self, e):
-        self._e = e
-
-    @property
-    def omega(self):
-        return self._omega * 180. / np.pi
-
-    @omega.setter
-    def omega(self, omega):
-        self._omega = omega * np.pi / 180.
+        self._pa = -pa * np.pi / 180.
 
 """
 Plot the points
@@ -302,4 +282,4 @@ if __name__ == '__main__':
 
     test = Deproj('test/HD121617_Qphi_500.fits', nr = 30, nt = 60)
     test.go(amin = 0.4, amax = 1.2, incl = 44.6, pa = -118.78, plot = 'full', plim = 1.2)
-    # # test.debug(amin = 0.5, amax = 1.5, incl = 80.6, pa = 10., omega = 0.)
+    # test.debug(amin = 0.4, amax = 1.2, incl = 44.6, pa = -118.78)
