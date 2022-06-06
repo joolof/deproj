@@ -90,6 +90,9 @@ class Deproj():
                 sel = ((self._distance >= rad[ir]) & (self._distance < rad[ir+1]) & (self._azimuth >= theta[it]) & (self._azimuth < theta[it+1]))
                 self.density[ir, it] = np.median(self._data[sel])
 
+        nrad = (rad[:-1] + rad[1:])/2.
+        ntheta = (theta[:-1] + theta[1:])/2.
+
         if doplot:
             """
             Set the cuts
@@ -112,7 +115,7 @@ class Deproj():
 
                 ax2 = fig.add_subplot(132)
                 ax2.grid(False)
-                ax2.pcolormesh(theta[:-1] * 180. / np.pi, rad[:-1], self.density, vmin = dmin, vmax = dmax, cmap = cmap)
+                ax2.pcolormesh(ntheta * 180./np.pi, nrad, self.density, vmin = dmin, vmax = dmax, cmap = cmap)
                 ax2.set_xlabel('$\\theta$ [$^\circ$]')
                 ax2.set_ylabel('r [$^{\prime\prime}$]')
 
@@ -120,7 +123,7 @@ class Deproj():
                 ax3.grid(False)
                 ax3.set_theta_zero_location('N')
                 ax3.set_theta_direction(-1)
-                ax3.pcolormesh(theta[:-1], rad[:-1], self.density, vmin = dmin, vmax = dmax, cmap = cmap)
+                ax3.pcolormesh(ntheta, nrad, self.density, vmin = dmin, vmax = dmax, cmap = cmap)
                 ax3.set_xticks(np.linspace(np.pi, -np.pi, 8, endpoint=False))
                 ax3.set_thetalim(-np.pi, np.pi)
                 ax3.set_yticklabels([])
@@ -132,7 +135,7 @@ class Deproj():
                 ax1.grid(False)
                 ax1.set_theta_zero_location('N')
                 ax1.set_theta_direction(-1)
-                ax1.pcolormesh(theta[:-1], rad[:-1], self.density, vmin = dmin, vmax = dmax, cmap = cmap)
+                ax1.pcolormesh(ntheta, nrad, self.density, vmin = dmin, vmax = dmax, cmap = cmap)
                 ax1.set_xticks(np.linspace(np.pi, -np.pi, 8, endpoint=False))
                 ax1.set_thetalim(-np.pi, np.pi)
                 ax1.set_yticklabels([])
@@ -141,12 +144,12 @@ class Deproj():
                 fig = plt.figure(figsize=(7,6))
                 ax1 = fig.add_axes([0.14, 0.14, 0.8, 0.8])
                 ax1.grid(False)
-                ax1.pcolormesh(theta[:-1], rad[:-1], self.density, vmin = dmin, vmax = dmax, cmap = cmap)
+                ax1.pcolormesh(ntheta * 180. / np.pi, nrad, self.density, vmin = dmin, vmax = dmax, cmap = cmap)
                 ax1.set_xlabel('$\\theta$ [$^\circ$]')
                 ax1.set_ylabel('r [$^{\prime\prime}$]')
                 plt.show()
 
-        return theta[:-1], rad[:-1], self.density
+        return ntheta, nrad, self.density
 
     def debug(self, **kwargs):
         """
