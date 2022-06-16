@@ -60,7 +60,7 @@ There are additional parameters that can be passed to the `go` method:
 
 ```python
 vmin = 1.         # The lower percentile for vmin
-vmax = 99.5       # The upper percentile for vmin
+vmax = 99.5       # The upper percentile for vmax
 cmap = 'viridis'  # The colormap
 plim = 1.1        # The extent when plotting the observations (in arcsec)
 plot = 'full'     # What to plot, can be either 'full', 'polar', or 'cartesian'
