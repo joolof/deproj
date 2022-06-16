@@ -27,6 +27,7 @@ There are very few parameters that you need to provide to get the deprojected ma
 
 ```python
 disk = Deproj('data_example/HR4796_Qphi_400.fits', nr = 30, nt = 60, pixscale = 0.0072)
+# disk = Deproj(qphi, nr = 30, nt = 60, pixscale = 0.0072) # Alternative way to initialize with a 2D array
 ```
 
 The first argument should either be the name of the fits file containing the observations or directly a 2D array. The observations should have the same number of pixels in both directions. Then, there are the following optional parameters that you can pass:
